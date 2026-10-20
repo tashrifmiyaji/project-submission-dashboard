@@ -2,6 +2,9 @@ import { env } from "./config/env.js";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
+import { notFound } from "./middlewares/notFound.js";
+import { globalError } from "./middlewares/globalError.js";
+
 
 const app = express();
 
@@ -22,5 +25,8 @@ app.get("/api/health", (_req, res) => {
     message: "Project Submission Dashboard API is running",
   });
 });
+
+app.use(notFound);
+app.use(globalError);
 
 export default app;
