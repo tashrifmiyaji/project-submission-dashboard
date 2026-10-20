@@ -4,7 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import { notFound } from "./middlewares/notFound.js";
 import { globalError } from "./middlewares/globalError.js";
-
+import { authRoutes } from "./modules/auth/auth.routes.js";
 
 const app = express();
 
@@ -25,6 +25,9 @@ app.get("/api/health", (_req, res) => {
     message: "Project Submission Dashboard API is running",
   });
 });
+
+// Authentication routes
+app.use("/api/auth", authRoutes);
 
 app.use(notFound);
 app.use(globalError);

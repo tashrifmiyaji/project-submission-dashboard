@@ -13,9 +13,9 @@ import type {
 
 const SALT_ROUNDS = 12;
 
-const createAccessToken = (userId: string, role: string): string => {
+const createAccessToken = (userId: string, role: string, email: string): string => {
   return jwt.sign(
-    { sub: userId, role },
+    { sub: userId, role, email },
     env.JWT_ACCESS_SECRET,
     { expiresIn: "1d" },
   );
@@ -56,7 +56,7 @@ export const signup = async (input: SignupInput) => {
 
     return {
       user: sanitizeUser(user),
-      accessToken: createAccessToken(user.id, user.role),
+      accessToken: createAccessToken(user.id, user.role, user.email),
     };
   } catch (error) {
     if (
@@ -87,7 +87,7 @@ export const login = async (input: LoginInput) => {
 
   return {
     user: sanitizeUser(user),
-    accessToken: createAccessToken(user.id, user.role),
+    accessToken: createAccessToken(user.id, user.role, user.email),
   };
 };
 
