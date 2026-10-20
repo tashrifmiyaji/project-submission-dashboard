@@ -10,5 +10,14 @@ node_modules/
 dist/
 build/
 
+#
+.agents
+.claude
+.windsurf
+skills-lock.json
+
 # Logs
 *.log
+/src/generated/prisma
+
+/src/generated/prisma

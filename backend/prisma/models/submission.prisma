@@ -1,0 +1,31 @@
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Submission {
+  id            String           @id @default(cuid())
+  studentId     String
+  reviewedById  String?
+
+  projectName   String
+  repositoryUrl String
+  liveUrl       String
+  description   String           @db.Text
+
+  status        SubmissionStatus @default(PENDING)
+  reviewComment String?          @db.Text
+  reviewedAt    DateTime?
+
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  student       User             @relation("SubmissionStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  reviewedBy    User?            @relation("SubmissionReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@unique([studentId, repositoryUrl])
+  @@index([status, createdAt])
+  @@index([studentId, createdAt])
+}

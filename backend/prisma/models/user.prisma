@@ -1,0 +1,20 @@
+
+enum Role {
+  ADMIN
+  MENTOR
+  STUDENT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  password     String
+  role         Role     @default(STUDENT)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  submissions  Submission[] @relation("SubmissionStudent")
+  reviews      Submission[] @relation("SubmissionReviewer")
+}
