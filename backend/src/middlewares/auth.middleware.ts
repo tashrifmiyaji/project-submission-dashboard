@@ -38,18 +38,28 @@ export const authMiddleware: RequestHandler = async (req, _res, next) => {
       throw new AppError(401, "Invalid authentication token payload");
     }
 
-    const isUser = prisma.user.findUnique({
-      where: { id: decoded.sub }
-    })
+    const isUser = await prisma.user.findUnique({
+      where: { id: decoded.sub },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        isActive: true,
+      },
+    });
 
     if (!isUser) {
-      throw new AppError(404, "user not found!");
+      throw new AppError(401, "Invalid or expired authentication token");
+    }
+
+    if (isUser.isActive === false) {
+      throw new AppError(403, "Your account has been deactivated");
     }
 
     req.user = {
-      userId: decoded.sub,
-      email: decoded.email,
-      role: decoded.role as import("../generated/prisma/client.js").Role,
+      userId: isUser.id,
+      email: isUser.email,
+      role: isUser.role,
     };
 
     next();
