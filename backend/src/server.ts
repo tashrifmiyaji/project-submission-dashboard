@@ -5,7 +5,7 @@ import { seedAdmin } from "./script/seed.js";
 
 const main = async () => {
   // seeding admin
-  seedAdmin()
+  await seedAdmin()
 
   const server = app.listen(env.PORT, () => {
     console.log(`Server is running on port ${env.PORT}`);

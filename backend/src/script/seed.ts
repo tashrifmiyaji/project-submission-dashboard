@@ -28,7 +28,7 @@ export const seedAdmin = async () => {
             data: {
                 name: adminName,
                 email: adminEmail,
-                password: adminPassword,
+                password: hashedPassword,
                 role: Role.ADMIN,
                 isActive: true,
             }
@@ -36,6 +36,8 @@ export const seedAdmin = async () => {
 
         console.log("Seed Admin Created");
     } catch (error) {
-        console.log("Error Seeding Admin : ", error);
+        console.error("Error seeding admin:", error);
+        throw error;
     }
 }
+
