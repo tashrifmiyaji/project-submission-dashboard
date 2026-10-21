@@ -5,6 +5,7 @@ import helmet from "helmet";
 import { notFound } from "./middlewares/notFound.js";
 import { globalError } from "./middlewares/globalError.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
+import { usersRoutes } from "./modules/user/users.routes.js";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.get("/api/health", (_req, res) => {
 
 // Authentication routes
 app.use("/api/auth", authRoutes);
+app.use("/api/users", usersRoutes);
 
 app.use(notFound);
 app.use(globalError);
