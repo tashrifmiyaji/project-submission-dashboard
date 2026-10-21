@@ -3,6 +3,7 @@ import type { RequestHandler } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 
 import { AppError } from "../utils/AppError.js";
+import { prisma } from "../lib/prisma.js";
 
 export const authMiddleware: RequestHandler = async (req, _res, next) => {
   try {
@@ -35,6 +36,14 @@ export const authMiddleware: RequestHandler = async (req, _res, next) => {
       typeof decoded.role !== "string"
     ) {
       throw new AppError(401, "Invalid authentication token payload");
+    }
+
+    const isUser = prisma.user.findUnique({
+      where: { id: decoded.sub }
+    })
+
+    if (!isUser) {
+      throw new AppError(404, "user not found!");
     }
 
     req.user = {
