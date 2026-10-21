@@ -7,6 +7,7 @@ import { globalError } from "./middlewares/globalError.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
 import { usersRoutes } from "./modules/user/users.routes.js";
 import { submissionsRoutes } from "./modules/submissions/submissions.routes.js";
+import { reviewsRoutes } from "./modules/reviews/reviews.routes.js";
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/submissions", submissionsRoutes);
+app.use("/api/reviews", reviewsRoutes);
 
 app.use(notFound);
 app.use(globalError);
