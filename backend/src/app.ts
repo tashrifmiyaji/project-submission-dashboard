@@ -6,6 +6,7 @@ import { notFound } from "./middlewares/notFound.js";
 import { globalError } from "./middlewares/globalError.js";
 import { authRoutes } from "./modules/auth/auth.routes.js";
 import { usersRoutes } from "./modules/user/users.routes.js";
+import { submissionsRoutes } from "./modules/submissions/submissions.routes.js";
 
 const app = express();
 
@@ -13,7 +14,7 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: env.FRONTEND_URL, 
+    origin: env.FRONTEND_URL,
     credentials: true,
   }),
 );
@@ -30,6 +31,7 @@ app.get("/api/health", (_req, res) => {
 // Authentication routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
+app.use("/api/submissions", submissionsRoutes);
 
 app.use(notFound);
 app.use(globalError);
