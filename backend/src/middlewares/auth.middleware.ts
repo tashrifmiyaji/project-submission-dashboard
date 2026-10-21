@@ -4,16 +4,11 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 
 import { AppError } from "../utils/AppError.js";
 import { prisma } from "../lib/prisma.js";
+import { de } from "zod/v4/locales";
 
 export const authMiddleware: RequestHandler = async (req, _res, next) => {
   try {
-    const authorization = req.headers.authorization;
-
-    if (!authorization?.startsWith("Bearer ")) {
-      throw new AppError(401, "Authentication token is required");
-    }
-
-    const token = authorization.split(" ")[1];
+    const token = req.cookies.accessToken
 
     if (!token) {
       throw new AppError(401, "Authentication token is required");

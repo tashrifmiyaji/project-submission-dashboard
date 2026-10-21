@@ -8,6 +8,8 @@ import {
 } from "./auth.validation.js";
 import { sendResponse } from "../../utils/sendResponse.js";
 import { AppError } from "../../utils/AppError.js";
+import type { CookieOptions } from "express";
+import { env } from "../../config/env.js";
 
 export const signupController = async (req: Request, res: Response) => {
   const parsed = signupSchema.safeParse(req.body);
@@ -17,6 +19,20 @@ export const signupController = async (req: Request, res: Response) => {
   }
 
   const result = await signup(parsed.data);
+
+  const accessTokenCookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: env.NODE_ENV === "production",
+    sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
+    maxAge: 15 * 60 * 1000,
+  };
+
+  res.cookie(
+    "accessToken",
+    result.accessToken,
+    accessTokenCookieOptions,
+  );
 
   return sendResponse(res, {
     statusCode: 201,
@@ -34,6 +50,20 @@ export const loginController = async (req: Request, res: Response) => {
   }
 
   const result = await login(parsed.data);
+
+  const accessTokenCookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: env.NODE_ENV === "production",
+    sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
+    maxAge: 15 * 60 * 1000,
+  };
+
+  res.cookie(
+    "accessToken",
+    result.accessToken,
+    accessTokenCookieOptions,
+  );
 
   return sendResponse(res, {
     statusCode: 200,
