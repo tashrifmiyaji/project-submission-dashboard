@@ -88,6 +88,20 @@ export const getMeController = async (req: Request, res: Response) => {
   });
 };
 
+export const logoutController = async (_req: Request, res: Response) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: env.NODE_ENV === "production",
+    sameSite: env.NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logout successful",
+  });
+};
+
 export const changePasswordController = async (
   req: Request,
   res: Response,
