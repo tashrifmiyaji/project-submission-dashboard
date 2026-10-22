@@ -1,5 +1,37 @@
 import { z } from "zod";
 
+const normalizeGithubRepositoryUrl = (value: string): string | null => {
+  try {
+    const url = new URL(value);
+    const pathSegments = url.pathname.replace(/^\/|\/$/g, "").split("/");
+
+    if (
+      url.protocol !== "https:" ||
+      url.hostname !== "github.com" ||
+      url.port !== "" ||
+      url.username ||
+      url.password ||
+      pathSegments.length !== 2
+    ) {
+      return null;
+    }
+
+    const [owner, rawRepository] = pathSegments;
+    const repository = rawRepository.replace(/\.git$/i, "");
+    const validOwner = /^[a-z0-9](?:[a-z0-9-]{0,37}[a-z0-9])?$/i.test(owner);
+    const validRepository =
+      /^[a-z0-9](?:[a-z0-9._-]{0,98}[a-z0-9])?$/i.test(repository);
+
+    if (!validOwner || !validRepository) {
+      return null;
+    }
+
+    return `https://github.com/${owner.toLowerCase()}/${repository.toLowerCase()}`;
+  } catch {
+    return null;
+  }
+};
+
 export const createSubmissionSchema = z.object({
   projectName: z
     .string()
@@ -10,22 +42,20 @@ export const createSubmissionSchema = z.object({
   repositoryUrl: z
     .string()
     .trim()
-    .url("Please provide a valid repository URL")
     .max(2048, "Repository URL is too long")
-    .refine(
-      (value) => {
-        try {
-          const url = new URL(value);
-          return (
-            url.protocol === "https:" &&
-            url.hostname.toLowerCase() === "github.com"
-          );
-        } catch {
-          return false;
-        }
-      },
-      "Repository URL must be a valid HTTPS GitHub URL",
-    ),
+    .transform((value, context) => {
+      const normalizedUrl = normalizeGithubRepositoryUrl(value);
+
+      if (!normalizedUrl) {
+        context.addIssue({
+          code: "custom",
+          message: "Please provide a valid HTTPS GitHub repository URL",
+        });
+        return z.NEVER;
+      }
+
+      return normalizedUrl;
+    }),
 
   liveUrl: z
     .string()
