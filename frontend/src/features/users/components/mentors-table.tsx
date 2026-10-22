@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CreateMentorForm } from "@/features/users/components/create-mentor-form";
 import { useMentors } from "@/features/users/hooks/use-mentors";
 
 export function MentorsTable() {
   const [page, setPage] = useState(1);
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
@@ -50,6 +53,31 @@ export function MentorsTable() {
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button
+          type="button"
+          variant={isCreateFormOpen ? "outline" : "default"}
+          aria-expanded={isCreateFormOpen}
+          aria-controls="create-mentor-form"
+          onClick={() => setIsCreateFormOpen((isOpen) => !isOpen)}
+        >
+          {isCreateFormOpen ? <X /> : <Plus />}
+          {isCreateFormOpen ? "Close form" : "Create mentor"}
+        </Button>
+      </div>
+
+      {isCreateFormOpen && (
+        <div
+          id="create-mentor-form"
+          className="rounded-lg border bg-muted/20 p-4"
+        >
+          <CreateMentorForm
+            onCreated={() => setIsCreateFormOpen(false)}
+            onCancel={() => setIsCreateFormOpen(false)}
+          />
+        </div>
+      )}
+
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-2">
           <label htmlFor="mentor-search" className="text-sm font-medium">
@@ -182,7 +210,9 @@ export function MentorsTable() {
               <Button
                 type="button"
                 variant="outline"
-                disabled={page >= data.meta.totalPages || isPlaceholderData || isError}
+                disabled={
+                  page >= data.meta.totalPages || isPlaceholderData || isError
+                }
                 onClick={() => setPage((current) => current + 1)}
               >
                 Next
