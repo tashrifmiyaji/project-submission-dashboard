@@ -2,13 +2,15 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, Server } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { api } from "@/apis/api";
 
 import {
   loginSchema,
@@ -19,6 +21,7 @@ import { useLogin } from "@/features/auth/hooks/use-login";
 export function LoginForm() {
   const router = useRouter();
   const loginMutation = useLogin();
+  const [isWakingServer, setIsWakingServer] = useState(false);
 
   const {
     register,
@@ -60,6 +63,24 @@ export function LoginForm() {
             ? error.message
             : "Unable to sign in. Please try again.";
       toast.error(message);
+    }
+  };
+
+  const wakeServer = async () => {
+    setIsWakingServer(true);
+    try {
+      const response = await api<{ success: boolean; message: string }>(
+        "/health",
+      );
+      toast.success(response.message || "Server is active and ready.");
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Could not reach the server. Please try again.";
+      toast.error(message);
+    } finally {
+      setIsWakingServer(false);
     }
   };
 
@@ -108,13 +129,28 @@ export function LoginForm() {
       <Button
         type="submit"
         className="w-full"
-        disabled={loginMutation.isPending}
+        disabled={loginMutation.isPending || isWakingServer}
       >
         {loginMutation.isPending && (
           <LoaderCircle className="animate-spin" />
         )}
 
         {loginMutation.isPending ? "Signing in..." : "Sign in"}
+      </Button>
+
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full"
+        onClick={wakeServer}
+        disabled={loginMutation.isPending || isWakingServer}
+      >
+        {isWakingServer ? (
+          <LoaderCircle className="animate-spin" />
+        ) : (
+          <Server />
+        )}
+        {isWakingServer ? "Activating server..." : "Activate Server"}
       </Button>
     </form>
   );
