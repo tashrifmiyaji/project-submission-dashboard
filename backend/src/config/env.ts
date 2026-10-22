@@ -16,6 +16,7 @@ export const env = {
   DATABASE_URL: requiredEnv("DATABASE_URL"),
   FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:3000",
   JWT_ACCESS_SECRET: requiredEnv("JWT_ACCESS_SECRET"),
+  ACCESS_TOKEN_TTL_SECONDS: Number(process.env.ACCESS_TOKEN_TTL_SECONDS),
   ADMIN_NAME: requiredEnv("ADMIN_NAME"),
   ADMIN_EMAIL: requiredEnv("ADMIN_EMAIL"),
   ADMIN_PASSWORD: requiredEnv("ADMIN_PASSWORD"),
