@@ -4,6 +4,7 @@ import { AuthGuard } from "@/features/auth/components/auth-guard";
 import { useGetMe } from "@/features/auth/hooks/use-get-me";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { CreateSubmissionForm } from "@/features/submissions/components/create-submission-form";
+import { MySubmissionsList } from "@/features/submissions/components/my-submissions-list";
 
 const ALLOWED_ROLES = ["STUDENT"] as const;
 
@@ -29,6 +30,7 @@ function StudentDashboardContent() {
           <LogoutButton />
         </div>
 
+      
         <section className="rounded-xl border bg-card p-6">
           <div className="mb-6 space-y-2">
             <h2 className="text-lg font-semibold">Submit a Project</h2>
@@ -40,6 +42,19 @@ function StudentDashboardContent() {
 
           <CreateSubmissionForm />
         </section>
+
+        <section className="space-y-6 rounded-xl border bg-card p-6">
+          <div className="space-y-2">
+            <h2 className="text-lg font-semibold">Your Projects</h2>
+
+            <p className="text-sm text-muted-foreground">
+              Track your submitted projects and review status.
+            </p>
+          </div>
+
+          <MySubmissionsList />
+        </section>
+
       </div>
     </main>
   );
