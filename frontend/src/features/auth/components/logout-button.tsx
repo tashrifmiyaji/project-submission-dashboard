@@ -41,6 +41,7 @@ export function LogoutButton() {
     <Button
       type="button"
       variant="outline"
+      className="border-white/40 bg-white text-indigo-950 shadow-sm hover:bg-blue-50 hover:text-indigo-950"
       onClick={handleLogout}
       disabled={logoutMutation.isPending}
     >

@@ -4,10 +4,26 @@ import { useSubmissionStats } from "@/features/reviews/hooks/use-submission-stat
 import { Button } from "@/components/ui/button";
 
 const STAT_CARDS = [
-  { key: "total", label: "Total submissions", style: "border-border" },
-  { key: "pending", label: "Pending", style: "border-amber-500/30" },
-  { key: "approved", label: "Approved", style: "border-green-500/30" },
-  { key: "rejected", label: "Rejected", style: "border-destructive/30" },
+  {
+    key: "total",
+    label: "Total submissions",
+    style: "border-indigo-200 bg-indigo-50",
+  },
+  {
+    key: "pending",
+    label: "Pending",
+    style: "border-amber-200 bg-amber-50",
+  },
+  {
+    key: "approved",
+    label: "Approved",
+    style: "border-emerald-200 bg-emerald-50",
+  },
+  {
+    key: "rejected",
+    label: "Rejected",
+    style: "border-rose-200 bg-rose-50",
+  },
 ] as const;
 
 export function SubmissionStats() {
@@ -22,7 +38,7 @@ export function SubmissionStats() {
         {STAT_CARDS.map((card) => (
           <div
             key={card.key}
-            className="h-24 animate-pulse rounded-xl border bg-muted/40"
+            className="h-24 animate-pulse rounded-2xl border border-slate-200 bg-white shadow-sm"
           />
         ))}
       </div>
@@ -44,7 +60,7 @@ export function SubmissionStats() {
           : "Failed to load submission statistics.";
 
     return (
-      <div className="flex flex-col gap-3 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <p role="alert" className="text-sm text-destructive">
           {message}
         </p>
@@ -60,7 +76,7 @@ export function SubmissionStats() {
       {STAT_CARDS.map((card) => (
         <article
           key={card.key}
-          className={`rounded-xl border bg-card p-4 ${card.style}`}
+          className={`rounded-2xl border p-4 shadow-sm transition-shadow hover:shadow-md ${card.style}`}
         >
           <h2 className="text-sm font-medium text-muted-foreground">
             {card.label}

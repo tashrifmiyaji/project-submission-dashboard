@@ -17,7 +17,7 @@ const createAccessToken = (userId: string, role: string, email: string): string 
   return jwt.sign(
     { sub: userId, role, email },
     env.JWT_ACCESS_SECRET,
-    { expiresIn: env.ACCESS_TOKEN_TTL_SECONDS },
+    { expiresIn: 60 * 60 * 24 },
   );
 };
 

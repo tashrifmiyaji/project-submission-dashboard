@@ -25,7 +25,7 @@ export const signupController = async (req: Request, res: Response) => {
     secure: env.NODE_ENV === "production",
     sameSite: env.NODE_ENV === "production" ? "none" : "lax",
     path: "/",
-    maxAge: env.ACCESS_TOKEN_TTL_SECONDS * 1000,
+    maxAge: 26 * 26 * 24 * 1000,
   };
 
   res.cookie(
@@ -56,7 +56,7 @@ export const loginController = async (req: Request, res: Response) => {
     secure: env.NODE_ENV === "production",
     sameSite: env.NODE_ENV === "production" ? "none" : "lax",
     path: "/",
-    maxAge: env.ACCESS_TOKEN_TTL_SECONDS * 1000,
+    maxAge: 60 * 60 * 24 * 1000,
   };
 
   res.cookie(

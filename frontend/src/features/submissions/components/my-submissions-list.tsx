@@ -78,7 +78,7 @@ export function MySubmissionsList() {
       {data.data.map((submission) => (
         <article
           key={submission.id}
-          className="space-y-3 rounded-lg border p-4"
+          className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0 space-y-1">

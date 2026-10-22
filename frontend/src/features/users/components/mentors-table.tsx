@@ -103,7 +103,7 @@ export function MentorsTable() {
       {isCreateFormOpen && (
         <div
           id="create-mentor-form"
-          className="rounded-lg border bg-muted/20 p-4"
+          className="rounded-xl border border-indigo-200 bg-indigo-50/70 p-4"
         >
           <CreateMentorForm
             onCreated={() => setIsCreateFormOpen(false)}
@@ -143,7 +143,7 @@ export function MentorsTable() {
                 setPage(1);
               }
             }}
-            className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm"
+            className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm shadow-sm"
           >
             <option value="ALL">All mentors</option>
             <option value="ACTIVE">Active</option>
@@ -177,9 +177,9 @@ export function MentorsTable() {
             </p>
           )}
 
-          <div className="overflow-x-auto rounded-lg border">
+          <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
             <table className="w-full min-w-[560px] text-left text-sm">
-              <thead className="bg-muted/60 text-muted-foreground">
+              <thead className="bg-indigo-50 text-slate-700">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-medium">
                     Mentor
@@ -195,9 +195,9 @@ export function MentorsTable() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-slate-100">
                 {data.data.map((mentor) => (
-                  <tr key={mentor.id}>
+                  <tr key={mentor.id} className="transition-colors hover:bg-indigo-50/50">
                     <td className="px-4 py-4">
                       <p className="font-medium text-foreground">
                         {mentor.name}
