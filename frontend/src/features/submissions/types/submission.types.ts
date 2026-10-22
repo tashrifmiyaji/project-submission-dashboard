@@ -44,6 +44,7 @@ export type SubmissionReviewer = {
   id: string;
   name: string;
   email: string;
+  role: "ADMIN" | "MENTOR";
 };
 
 export type AllSubmission = Submission & {

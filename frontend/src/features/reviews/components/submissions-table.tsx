@@ -264,6 +264,58 @@ export function SubmissionsTable() {
                         )}
                       </td>
                     </tr>
+                    {submission.status !== "PENDING" && (
+                      <tr>
+                        <td
+                          colSpan={6}
+                          className="border-t border-indigo-100 bg-indigo-50/70 px-4 py-4"
+                        >
+                          <div className="grid gap-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+                            <div className="space-y-1">
+                              <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                {submission.status === "APPROVED"
+                                  ? "Approval feedback"
+                                  : "Rejection reason"}
+                              </p>
+                              <p className="whitespace-pre-wrap text-sm text-slate-800">
+                                {submission.reviewComment ??
+                                  "No review comment was recorded."}
+                              </p>
+                            </div>
+                            <div className="space-y-1 text-sm">
+                              <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+                                Reviewed by
+                              </p>
+                              {submission.reviewedBy ? (
+                                <>
+                                  <p className="font-medium text-slate-900">
+                                    {submission.reviewedBy.name} (
+                                    {submission.reviewedBy.role === "ADMIN"
+                                      ? "Admin"
+                                      : "Mentor"}
+                                    )
+                                  </p>
+                                  <p className="text-slate-600">
+                                    {submission.reviewedBy.email}
+                                  </p>
+                                </>
+                              ) : (
+                                <p className="text-slate-600">
+                                  Reviewer information is unavailable.
+                                </p>
+                              )}
+                              {submission.reviewedAt && (
+                                <p className="pt-1 text-xs text-slate-600">
+                                  {new Date(
+                                    submission.reviewedAt,
+                                  ).toLocaleString()}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
                     {reviewTarget?.id === submission.id && (
                       <tr>
                         <td colSpan={6} className="bg-indigo-50/70 px-4 py-4">

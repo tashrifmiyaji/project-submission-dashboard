@@ -408,7 +408,7 @@ Authenticated `MENTOR` or `ADMIN`. Returns submissions from all students.
 
 **Query parameters:** same `status`, `search`, `page`, and `limit` fields as `GET /submissions/my`. Filtering and pagination are applied server-side. Search matches project name, student name, or student email.
 
-**`200` response:** paginated envelope; each submission includes `id`, project fields, status/review fields, timestamps, `student` (`id`, `name`, `email`), and `reviewedBy` (the same public user fields, or `null`).
+**`200` response:** paginated envelope; each submission includes `id`, project fields, status/review fields, timestamps, `student` (`id`, `name`, `email`), and `reviewedBy` (`id`, `name`, `email`, `role` of `ADMIN` or `MENTOR`, or `null`).
 
 #### `GET /submissions/stats`
 
