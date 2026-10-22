@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth.middleware.js";
 import { authorizeRoles } from "../../middlewares/role.middleware.js";
+import { submissionRateLimit } from "../../middlewares/submission-rate-limit.middleware.js";
 import {
     createSubmissionController,
     getMySubmissionsController,
@@ -15,6 +16,7 @@ router.use(authMiddleware);
 router.post(
     "/",
     authorizeRoles("STUDENT"),
+    submissionRateLimit,
     createSubmissionController,
 );
 
