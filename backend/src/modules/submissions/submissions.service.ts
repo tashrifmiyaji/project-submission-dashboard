@@ -187,3 +187,29 @@ export const getAllSubmissions = async (
     },
   };
 };
+
+export const getSubmissionStats = async () => {
+  const statusCounts = await prisma.submission.groupBy({
+    by: ["status"],
+    _count: {
+      _all: true,
+    },
+  });
+
+  const counts = {
+    PENDING: 0,
+    APPROVED: 0,
+    REJECTED: 0,
+  };
+
+  for (const item of statusCounts) {
+    counts[item.status] = item._count._all;
+  }
+
+  return {
+    total: counts.PENDING + counts.APPROVED + counts.REJECTED,
+    pending: counts.PENDING,
+    approved: counts.APPROVED,
+    rejected: counts.REJECTED,
+  };
+};

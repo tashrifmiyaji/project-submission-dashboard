@@ -5,6 +5,7 @@ import { AuthGuard } from "@/features/auth/components/auth-guard";
 import { useGetMe } from "@/features/auth/hooks/use-get-me";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { SubmissionsTable } from "@/features/reviews/components/submissions-table";
+import { SubmissionStats } from "@/features/reviews/components/submission-stats";
 
 function MentorDashboardContent() {
   const { data } = useGetMe();
@@ -30,6 +31,8 @@ function MentorDashboardContent() {
 
           <LogoutButton />
         </div>
+
+        <SubmissionStats />
 
         <section className="space-y-6 rounded-xl border bg-card p-6">
           <div className="space-y-2">

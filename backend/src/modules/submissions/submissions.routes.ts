@@ -5,6 +5,7 @@ import {
     createSubmissionController,
     getMySubmissionsController,
     getAllSubmissionsController,
+    getSubmissionStatsController,
 } from "./submissions.controller.js";
 
 const router = Router();
@@ -21,6 +22,12 @@ router.get(
     "/my",
     authorizeRoles("STUDENT"),
     getMySubmissionsController,
+);
+
+router.get(
+    "/stats",
+    authorizeRoles("ADMIN", "MENTOR"),
+    getSubmissionStatsController,
 );
 
 router.get(

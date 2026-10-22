@@ -5,6 +5,7 @@ import {
     createSubmission,
     getMySubmissions,
     getAllSubmissions,
+    getSubmissionStats,
 } from "./submissions.service.js";
 
 import {
@@ -82,5 +83,16 @@ export const getAllSubmissionsController = async (req: Request, res: Response) =
         message: "Submissions retrieved successfully",
         data: result.data,
         meta: result.meta,
+    });
+};
+
+export const getSubmissionStatsController = async (_req: Request, res: Response) => {
+    const result = await getSubmissionStats();
+
+    return sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Submission statistics retrieved successfully",
+        data: result,
     });
 };
