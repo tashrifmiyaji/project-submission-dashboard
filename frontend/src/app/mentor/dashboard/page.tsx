@@ -4,6 +4,7 @@
 import { AuthGuard } from "@/features/auth/components/auth-guard";
 import { useGetMe } from "@/features/auth/hooks/use-get-me";
 import { LogoutButton } from "@/features/auth/components/logout-button";
+import { SubmissionsTable } from "@/features/reviews/components/submissions-table";
 
 function MentorDashboardContent() {
   const { data } = useGetMe();
@@ -30,13 +31,14 @@ function MentorDashboardContent() {
           <LogoutButton />
         </div>
 
-        <section className="rounded-xl border bg-card p-6">
-          <h2 className="text-lg font-semibold">Project Reviews</h2>
-
-          <p className="mt-2 text-sm text-muted-foreground">
-            Review student submissions, update their status, and manage
-            project evaluations.
-          </p>
+        <section className="space-y-6 rounded-xl border bg-card p-6">
+          <div className="space-y-2">
+            <h2 className="text-lg font-semibold">Project Reviews</h2>
+            <p className="text-sm text-muted-foreground">
+              Browse student projects and filter submissions by review status.
+            </p>
+          </div>
+          <SubmissionsTable />
         </section>
       </div>
     </main>
