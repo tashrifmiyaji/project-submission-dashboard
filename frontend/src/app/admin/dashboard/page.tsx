@@ -2,10 +2,11 @@
 
 import { AuthGuard } from "@/features/auth/components/auth-guard";
 import { useGetMe } from "@/features/auth/hooks/use-get-me";
+import { LogoutButton } from "@/features/auth/components/logout-button";
 
 function AdminDashboardContent() {
   const { data } = useGetMe();
-  const user = data?.data.user;
+  const user = data?.data;
 
   return (
     <main className="min-h-svh px-6 py-12">
@@ -22,6 +23,7 @@ function AdminDashboardContent() {
           <p className="text-muted-foreground">
             Welcome back{user?.name ? `, ${user.name}` : ""}!
           </p>
+          <LogoutButton />
         </div>
 
         <section className="rounded-xl border bg-card p-6">

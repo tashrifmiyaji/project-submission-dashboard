@@ -3,6 +3,7 @@
 
 import { AuthGuard } from "@/features/auth/components/auth-guard";
 import { useGetMe } from "@/features/auth/hooks/use-get-me";
+import { LogoutButton } from "@/features/auth/components/logout-button";
 
 function MentorDashboardContent() {
   const { data } = useGetMe();
@@ -23,6 +24,7 @@ function MentorDashboardContent() {
           <p className="text-muted-foreground">
             Welcome back{user?.name ? `, ${user.name}` : ""}!
           </p>
+          <LogoutButton />
         </div>
 
         <section className="rounded-xl border bg-card p-6">
