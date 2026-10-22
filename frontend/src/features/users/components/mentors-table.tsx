@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { Plus, X } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CreateMentorForm } from "@/features/users/components/create-mentor-form";
 import { useMentors } from "@/features/users/hooks/use-mentors";
+import { useUpdateMentorStatus } from "@/features/users/hooks/use-update-mentor-status";
 
 export function MentorsTable() {
   const [page, setPage] = useState(1);
@@ -13,6 +15,7 @@ export function MentorsTable() {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
+  const statusMutation = useUpdateMentorStatus();
   const limit = 10;
 
   useEffect(() => {
@@ -50,6 +53,37 @@ export function MentorsTable() {
       : error instanceof Error
         ? error.message
         : "Failed to load mentors.";
+
+  const handleStatusToggle = async (
+    mentorId: string,
+    isActive: boolean,
+  ) => {
+    try {
+      const response = await statusMutation.mutateAsync({
+        mentorId,
+        isActive,
+      });
+      toast.success(
+        response.message ||
+          `Mentor ${isActive ? "activated" : "deactivated"} successfully.`,
+      );
+    } catch (error) {
+      const data =
+        typeof error === "object" && error !== null && "data" in error
+          ? error.data
+          : null;
+      const message =
+        typeof data === "object" &&
+        data !== null &&
+        "message" in data &&
+        typeof data.message === "string"
+          ? data.message
+          : error instanceof Error
+            ? error.message
+            : "Unable to update mentor status. Please try again.";
+      toast.error(message);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -156,6 +190,9 @@ export function MentorsTable() {
                   <th scope="col" className="px-4 py-3 font-medium">
                     Status
                   </th>
+                  <th scope="col" className="px-4 py-3 font-medium">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -182,6 +219,19 @@ export function MentorsTable() {
                       >
                         {mentor.isActive ? "Active" : "Inactive"}
                       </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={mentor.isActive ? "destructive" : "outline"}
+                        disabled={statusMutation.isPending}
+                        onClick={() =>
+                          handleStatusToggle(mentor.id, !mentor.isActive)
+                        }
+                      >
+                        {mentor.isActive ? "Deactivate" : "Activate"}
+                      </Button>
                     </td>
                   </tr>
                 ))}
