@@ -5,6 +5,7 @@ import { useGetMe } from "@/features/auth/hooks/use-get-me";
 import { LogoutButton } from "@/features/auth/components/logout-button";
 import { SubmissionsTable } from "@/features/reviews/components/submissions-table";
 import { SubmissionStats } from "@/features/reviews/components/submission-stats";
+import { MentorsTable } from "@/features/users/components/mentors-table";
 
 function AdminDashboardContent() {
   const { data } = useGetMe();
@@ -31,13 +32,14 @@ function AdminDashboardContent() {
           <LogoutButton />
         </div>
 
-        <section className="rounded-xl border bg-card p-6">
-          <h2 className="text-lg font-semibold">Mentor Management</h2>
-
-          <p className="mt-2 text-sm text-muted-foreground">
-            Create mentors, search mentor accounts, and manage their active
-            status.
-          </p>
+        <section className="space-y-6 rounded-xl border bg-card p-6">
+          <div className="space-y-2">
+            <h2 className="text-lg font-semibold">Mentor Management</h2>
+            <p className="text-sm text-muted-foreground">
+              Search, filter, and browse mentor accounts.
+            </p>
+          </div>
+          <MentorsTable />
         </section>
 
         <section className="space-y-6 rounded-xl border bg-card p-6">
