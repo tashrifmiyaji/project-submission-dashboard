@@ -4,6 +4,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,19 +39,25 @@ export function CreateSubmissionForm() {
     try {
       await submissionMutation.mutateAsync(values);
       reset();
-    } catch {
-      // The API error is displayed below.
+      toast.success("Project submitted successfully.");
+    } catch (error) {
+      const data =
+        typeof error === "object" && error !== null && "data" in error
+          ? error.data
+          : null;
+      const message =
+        typeof data === "object" &&
+        data !== null &&
+        "message" in data &&
+        typeof data.message === "string"
+          ? data.message
+          : error instanceof Error
+            ? error.message
+            : "Unable to submit your project. Please try again.";
+
+      toast.error(message);
     }
   };
-
-  const errorMessage = submissionMutation.error
-    ? (
-        submissionMutation.error as {
-          data?: { message?: string };
-          message?: string;
-        }
-      ).data?.message ?? submissionMutation.error.message
-    : null;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -120,18 +127,6 @@ export function CreateSubmissionForm() {
           </p>
         )}
       </div>
-
-      {errorMessage && (
-        <p role="alert" className="text-sm text-destructive">
-          {errorMessage}
-        </p>
-      )}
-
-      {submissionMutation.isSuccess && (
-        <p role="status" className="text-sm text-green-600">
-          Project submitted successfully.
-        </p>
-      )}
 
       <Button
         type="submit"
