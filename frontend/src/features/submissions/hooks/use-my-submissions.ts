@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
@@ -16,5 +15,6 @@ export function useMySubmissions({
   return useQuery({
     queryKey: ["submissions", "my", { page, limit }],
     queryFn: () => getMySubmissions({ page, limit }),
+    placeholderData: (previousData) => previousData,
   });
 }

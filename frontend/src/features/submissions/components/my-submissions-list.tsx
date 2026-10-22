@@ -1,6 +1,8 @@
+
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useMySubmissions } from "@/features/submissions/hooks/use-my-submissions";
 import type { SubmissionStatus } from "@/features/submissions/types/submission.types";
 import { Button } from "@/components/ui/button";
@@ -18,10 +20,17 @@ const STATUS_STYLES: Record<SubmissionStatus, string> = {
 };
 
 export function MySubmissionsList() {
-  const { data, isPending, isError, error, refetch } = useMySubmissions({
-    page: 1,
-    limit: 10,
-  });
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const {
+    data,
+    isPending,
+    isError,
+    error,
+    refetch,
+    isPlaceholderData,
+  } = useMySubmissions({ page, limit });
 
   if (isPending) {
     return (
@@ -31,7 +40,7 @@ export function MySubmissionsList() {
     );
   }
 
-  if (isError) {
+  if (isError && !data) {
     return (
       <div className="space-y-3">
         <p role="alert" className="text-sm text-destructive">
@@ -46,7 +55,9 @@ export function MySubmissionsList() {
     );
   }
 
-  if (data.data.length === 0) {
+  if (!data) return null;
+
+  if (data.data.length === 0 && page === 1) {
     return (
       <p className="text-sm text-muted-foreground">
         You haven&apos;t submitted any projects yet.
@@ -54,8 +65,16 @@ export function MySubmissionsList() {
     );
   }
 
+  const { total, totalPages } = data.meta;
+
   return (
     <div className="space-y-4">
+      {isError && (
+        <p role="alert" className="text-sm text-destructive">
+          Could not refresh the projects. Showing the previously loaded data.
+        </p>
+      )}
+
       {data.data.map((submission) => (
         <article
           key={submission.id}
@@ -112,9 +131,41 @@ export function MySubmissionsList() {
         </article>
       ))}
 
-      <p className="text-sm text-muted-foreground">
-        Showing {data.data.length} of {data.meta.total} projects
-      </p>
+      <div className="flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-muted-foreground">
+          Showing {total === 0 ? 0 : (page - 1) * limit + 1}
+          {"–"}
+          {Math.min(page * limit, total)} of {total} projects
+        </p>
+
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={page === 1 || isPlaceholderData}
+            onClick={() => setPage((current) => Math.max(1, current - 1))}
+          >
+            Previous
+          </Button>
+
+          <span className="whitespace-nowrap text-sm text-muted-foreground">
+            Page {page} of {Math.max(1, totalPages)}
+          </span>
+
+          <Button
+            type="button"
+            variant="outline"
+            disabled={
+              page >= totalPages ||
+              isPlaceholderData ||
+              isError
+            }
+            onClick={() => setPage((current) => current + 1)}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
