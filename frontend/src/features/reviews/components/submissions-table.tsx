@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useReviewSubmission } from "@/features/reviews/hooks/use-review-submission";
 import { useSubmissions } from "@/features/reviews/hooks/use-submissions";
 import type { SubmissionStatus } from "@/features/submissions/types/submission.types";
 
@@ -14,6 +17,12 @@ const STATUS_STYLES: Record<SubmissionStatus, string> = {
 export function SubmissionsTable() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<SubmissionStatus | "ALL">("ALL");
+  const [reviewTarget, setReviewTarget] = useState<{
+    id: string;
+    status: "APPROVED" | "REJECTED";
+  } | null>(null);
+  const [reviewComment, setReviewComment] = useState("");
+  const reviewMutation = useReviewSubmission();
   const limit = 10;
   const {
     data,
@@ -51,6 +60,50 @@ export function SubmissionsTable() {
     }
 
     setPage(1);
+  };
+
+  const handleReviewSubmit = async () => {
+    if (!reviewTarget) return;
+
+    const comment = reviewComment.trim();
+    if (comment.length < 5) {
+      toast.error("Review comment must be at least 5 characters.");
+      return;
+    }
+    if (comment.length > 2000) {
+      toast.error("Review comment cannot exceed 2000 characters.");
+      return;
+    }
+
+    try {
+      await reviewMutation.mutateAsync({
+        submissionId: reviewTarget.id,
+        status: reviewTarget.status,
+        reviewComment: comment,
+      });
+      toast.success(
+        reviewTarget.status === "APPROVED"
+          ? "Project approved successfully."
+          : "Project rejected successfully.",
+      );
+      setReviewTarget(null);
+      setReviewComment("");
+    } catch (error) {
+      const data =
+        typeof error === "object" && error !== null && "data" in error
+          ? error.data
+          : null;
+      const message =
+        typeof data === "object" &&
+        data !== null &&
+        "message" in data &&
+        typeof data.message === "string"
+          ? data.message
+          : error instanceof Error
+            ? error.message
+            : "Unable to review this project. Please try again.";
+      toast.error(message);
+    }
   };
 
   return (
@@ -118,58 +171,163 @@ export function SubmissionsTable() {
                   <th scope="col" className="px-4 py-3 font-medium">
                     Links
                   </th>
+                  <th scope="col" className="px-4 py-3 font-medium">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {data.data.map((submission) => (
-                  <tr key={submission.id} className="align-top">
-                    <td className="max-w-xs px-4 py-4">
-                      <p className="font-medium text-foreground">
-                        {submission.projectName}
-                      </p>
-                      <p className="mt-1 line-clamp-2 text-muted-foreground">
-                        {submission.description}
-                      </p>
-                    </td>
-                    <td className="px-4 py-4">
-                      <p className="font-medium text-foreground">
-                        {submission.student.name}
-                      </p>
-                      <p className="mt-1 text-muted-foreground">
-                        {submission.student.email}
-                      </p>
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-4 text-muted-foreground">
-                      {new Date(submission.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-4">
-                      <span
-                        className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[submission.status]}`}
-                      >
-                        {submission.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-col items-start gap-2">
-                        <a
-                          href={submission.repositoryUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-medium text-primary underline-offset-4 hover:underline"
+                  <Fragment key={submission.id}>
+                    <tr className="align-top">
+                      <td className="max-w-xs px-4 py-4">
+                        <p className="font-medium text-foreground">
+                          {submission.projectName}
+                        </p>
+                        <p className="mt-1 line-clamp-2 text-muted-foreground">
+                          {submission.description}
+                        </p>
+                      </td>
+                      <td className="px-4 py-4">
+                        <p className="font-medium text-foreground">
+                          {submission.student.name}
+                        </p>
+                        <p className="mt-1 text-muted-foreground">
+                          {submission.student.email}
+                        </p>
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-4 text-muted-foreground">
+                        {new Date(submission.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-4">
+                        <span
+                          className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[submission.status]}`}
                         >
-                          Repository
-                        </a>
-                        <a
-                          href={submission.liveUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="font-medium text-primary underline-offset-4 hover:underline"
-                        >
-                          Live project
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
+                          {submission.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-col items-start gap-2">
+                          <a
+                            href={submission.repositoryUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-primary underline-offset-4 hover:underline"
+                          >
+                            Repository
+                          </a>
+                          <a
+                            href={submission.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-primary underline-offset-4 hover:underline"
+                          >
+                            Live project
+                          </a>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        {submission.status === "PENDING" ? (
+                          <div className="flex flex-col items-start gap-2">
+                            <Button
+                              type="button"
+                              size="sm"
+                              disabled={reviewMutation.isPending}
+                              onClick={() => {
+                                setReviewTarget({
+                                  id: submission.id,
+                                  status: "APPROVED",
+                                });
+                                setReviewComment("");
+                              }}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="destructive"
+                              disabled={reviewMutation.isPending}
+                              onClick={() => {
+                                setReviewTarget({
+                                  id: submission.id,
+                                  status: "REJECTED",
+                                });
+                                setReviewComment("");
+                              }}
+                            >
+                              Reject
+                            </Button>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">Reviewed</span>
+                        )}
+                      </td>
+                    </tr>
+                    {reviewTarget?.id === submission.id && (
+                      <tr>
+                        <td colSpan={6} className="bg-muted/30 px-4 py-4">
+                          <div className="mx-auto max-w-2xl space-y-3">
+                            <label
+                              htmlFor={`review-comment-${submission.id}`}
+                              className="block text-sm font-medium"
+                            >
+                              {reviewTarget.status === "APPROVED"
+                                ? "Feedback for approval"
+                                : "Reason for rejection"}{" "}
+                              <span className="text-muted-foreground">
+                                (required)
+                              </span>
+                            </label>
+                            <Textarea
+                              id={`review-comment-${submission.id}`}
+                              value={reviewComment}
+                              onChange={(event) =>
+                                setReviewComment(event.target.value)
+                              }
+                              placeholder="Write constructive feedback for the student..."
+                              rows={3}
+                              maxLength={2000}
+                              disabled={reviewMutation.isPending}
+                            />
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                              <p className="text-xs text-muted-foreground">
+                                {reviewComment.length}/2000 characters · at
+                                least 5 required
+                              </p>
+                              <div className="flex gap-2">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  disabled={reviewMutation.isPending}
+                                  onClick={() => {
+                                    setReviewTarget(null);
+                                    setReviewComment("");
+                                  }}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant={
+                                    reviewTarget.status === "REJECTED"
+                                      ? "destructive"
+                                      : "default"
+                                  }
+                                  disabled={reviewMutation.isPending}
+                                  onClick={handleReviewSubmit}
+                                >
+                                  {reviewMutation.isPending
+                                    ? "Saving review..."
+                                    : `Confirm ${reviewTarget.status === "APPROVED" ? "approval" : "rejection"}`}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
