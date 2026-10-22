@@ -15,6 +15,12 @@ export type LoginResponse = {
   message: string;
   data: {
     user: AuthUser;
-    accessToken: string;
+    accessToken?: string;
   };
+};
+
+export type GetMeResponse = {
+  success: boolean;
+  message: string;
+  data: AuthUser;
 };

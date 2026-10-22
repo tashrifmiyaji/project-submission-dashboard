@@ -3,6 +3,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +17,7 @@ import {
 import { useLogin } from "@/features/auth/hooks/use-login";
 
 export function LoginForm() {
+  const router = useRouter();
   const loginMutation = useLogin();
 
   const {
@@ -31,7 +34,16 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginFormValues) => {
     try {
-      await loginMutation.mutateAsync(values);
+     const response = await loginMutation.mutateAsync(values);
+    const { role } = response.data.user;
+
+    if (role === "ADMIN") {
+      router.replace("/admin/dashboard");
+    } else if (role === "MENTOR") {
+      router.replace("/mentor/dashboard");
+    } else {
+      router.replace("/student/dashboard");
+    }
     } catch {
       // The API error is displayed below.
     }
