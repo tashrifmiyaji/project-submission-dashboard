@@ -5,12 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, Server } from "lucide-react";
 import { toast } from "sonner";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { api } from "@/apis/api";
 
 import {
   signupSchema,
@@ -21,6 +23,7 @@ import { useSignup } from "@/features/auth/hooks/use-signup";
 export function SignupForm() {
   const router = useRouter();
   const signupMutation = useSignup();
+  const [isWakingServer, setIsWakingServer] = useState(false);
 
   const {
     register,
@@ -65,6 +68,24 @@ export function SignupForm() {
             ? error.message
             : "Unable to create your account. Please try again.";
       toast.error(message);
+    }
+  };
+
+  const wakeServer = async () => {
+    setIsWakingServer(true);
+    try {
+      const response = await api<{ success: boolean; message: string }>(
+        "/health",
+      );
+      toast.success(response.message || "Server is active and ready.");
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Could not reach the server. Please try again.";
+      toast.error(message);
+    } finally {
+      setIsWakingServer(false);
     }
   };
 
@@ -126,7 +147,7 @@ export function SignupForm() {
       <Button
         type="submit"
         className="w-full"
-        disabled={signupMutation.isPending}
+        disabled={signupMutation.isPending || isWakingServer}
       >
         {signupMutation.isPending && (
           <LoaderCircle className="animate-spin" />
@@ -134,6 +155,21 @@ export function SignupForm() {
         {signupMutation.isPending
           ? "Creating account..."
           : "Create Account"}
+      </Button>
+
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full"
+        onClick={wakeServer}
+        disabled={signupMutation.isPending || isWakingServer}
+      >
+        {isWakingServer ? (
+          <LoaderCircle className="animate-spin" />
+        ) : (
+          <Server />
+        )}
+        {isWakingServer ? "Activating server..." : "Activate Server"}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
