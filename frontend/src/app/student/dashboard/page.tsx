@@ -3,6 +3,7 @@
 import { AuthGuard } from "@/features/auth/components/auth-guard";
 import { useGetMe } from "@/features/auth/hooks/use-get-me";
 import { LogoutButton } from "@/features/auth/components/logout-button";
+import { CreateSubmissionForm } from "@/features/submissions/components/create-submission-form";
 
 const ALLOWED_ROLES = ["STUDENT"] as const;
 
@@ -29,11 +30,15 @@ function StudentDashboardContent() {
         </div>
 
         <section className="rounded-xl border bg-card p-6">
-          <h2 className="text-lg font-semibold">Your Projects</h2>
+          <div className="mb-6 space-y-2">
+            <h2 className="text-lg font-semibold">Submit a Project</h2>
 
-          <p className="mt-2 text-sm text-muted-foreground">
-            Your project submissions and review status will appear here.
-          </p>
+            <p className="text-sm text-muted-foreground">
+              Submit your project repository and live link for review.
+            </p>
+          </div>
+
+          <CreateSubmissionForm />
         </section>
       </div>
     </main>
