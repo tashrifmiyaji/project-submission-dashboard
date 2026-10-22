@@ -24,3 +24,18 @@ export type GetMeResponse = {
   message: string;
   data: AuthUser;
 };
+
+export type LogoutResponse = {
+  success: boolean;
+  message: string;
+};
+
+
+export type SignupResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    user: AuthUser;
+    accessToken?: string;
+  };
+};
