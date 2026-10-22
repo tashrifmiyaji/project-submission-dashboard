@@ -1,0 +1,458 @@
+{
+  "info": {
+    "_postman_id": "53733ac8-fd83-4a9e-9556-14d6b69d5e73",
+    "name": "Project Submission Dashboard API",
+    "description": "API requests for the Project Submission Dashboard. Set baseUrl and credentials in collection variables. Login/signup set an HTTP-only accessToken cookie; Postman sends the cookie automatically to the same API host. Use the appropriate Admin, Mentor, or Student account for role-protected requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@example.com",
+      "type": "string"
+    },
+    {
+      "key": "adminPassword",
+      "value": "replace-with-admin-password",
+      "type": "string"
+    },
+    {
+      "key": "studentEmail",
+      "value": "student@example.com",
+      "type": "string"
+    },
+    {
+      "key": "studentPassword",
+      "value": "replace-with-student-password",
+      "type": "string"
+    },
+    {
+      "key": "currentPassword",
+      "value": "replace-with-current-password",
+      "type": "string"
+    },
+    {
+      "key": "mentorEmail",
+      "value": "mentor@example.com",
+      "type": "string"
+    },
+    {
+      "key": "mentorPassword",
+      "value": "replace-with-mentor-password",
+      "type": "string"
+    },
+    {
+      "key": "mentorId",
+      "value": "replace-with-mentor-id",
+      "type": "string"
+    },
+    {
+      "key": "submissionId",
+      "value": "replace-with-submission-id",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "description": "Public API health check.",
+      "item": [
+        {
+          "name": "API health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Public. No body, path parameters, or query parameters. Expected 200: { success, message }."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "description": "Signup/login set an HTTP-only accessToken cookie. Postman retains and sends the cookie for requests to the same host.",
+      "item": [
+        {
+          "name": "Signup student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sample Student\",\n  \"email\": \"{{studentEmail}}\",\n  \"password\": \"{{studentPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "signup"]
+            },
+            "description": "Public. Body: name (2-100 chars), email (valid, max 254), password (8-72). Expected 201 with data.user and data.accessToken; sets accessToken cookie. Duplicate email: 409."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Public. Body: email and password. Expected 200 with data.user and data.accessToken; sets accessToken cookie. Change collection variables to log in as Admin, Mentor, or Student."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Public. No body, path parameters, or query parameters. Clears the accessToken cookie. Expected 200: { success, message }."
+          },
+          "response": []
+        },
+        {
+          "name": "Get current user",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Authenticated, any active role. No body, path parameters, or query parameters. Expected 200 with the current user's public profile in data."
+          },
+          "response": []
+        },
+        {
+          "name": "Change password",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{currentPassword}}\",\n  \"newPassword\": \"replace-with-new-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "change-password"]
+            },
+            "description": "Authenticated, any active role. Body: currentPassword and newPassword (8-72 chars and different from current). Expected 200: { success, message }."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users - Mentors",
+      "description": "All requests require an authenticated Admin.",
+      "item": [
+        {
+          "name": "Create mentor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sample Mentor\",\n  \"email\": \"{{mentorEmail}}\",\n  \"password\": \"{{mentorPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/mentors",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "mentors"]
+            },
+            "description": "Admin only. Body: name (2-100 chars), email (valid, max 254), password (8-72). Expected 201 with the new Mentor's public fields in data (password is not returned). Existing email: 409."
+          },
+          "response": []
+        },
+        {
+          "name": "List mentors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/mentors?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "mentors"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Optional name/email search, up to 100 characters."
+                },
+                {
+                  "key": "isActive",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Optional true or false."
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Optional positive integer; defaults to 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Optional integer 1-100; defaults to 10."
+                }
+              ]
+            },
+            "description": "Admin only. Optional query: search, isActive=true|false, page, limit. Expected 200 with paginated data of public Mentor fields and meta."
+          },
+          "response": []
+        },
+        {
+          "name": "Update mentor active status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/mentors/{{mentorId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "mentors", "{{mentorId}}", "status"]
+            },
+            "description": "Admin only. Path: mentorId. Body: isActive boolean. Expected 200 with updated Mentor public fields in data. Missing/non-Mentor ID: 404."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Submissions",
+      "item": [
+        {
+          "name": "Create submission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectName\": \"Portfolio Dashboard\",\n  \"repositoryUrl\": \"https://github.com/student/portfolio-dashboard\",\n  \"liveUrl\": \"https://portfolio.example.com\",\n  \"description\": \"A responsive portfolio dashboard built with Next.js and TypeScript.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/submissions",
+              "host": ["{{baseUrl}}"],
+              "path": ["submissions"]
+            },
+            "description": "Student only. Body: projectName (3-150), repositoryUrl (HTTPS github.com/owner/repository), liveUrl (HTTPS URL), description (20-5000). Expected 201 with submission in data. Same student's duplicate normalized repository: 409. More than 5 requests per 15 minutes: 429."
+          },
+          "response": []
+        },
+        {
+          "name": "List my submissions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/submissions/my?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["submissions", "my"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Optional PENDING, APPROVED, or REJECTED."
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Optional project name search, max 150 characters."
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Optional positive integer; defaults to 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Optional integer 1-100; defaults to 10."
+                }
+              ]
+            },
+            "description": "Student only. Optional query: status, search, page, limit. Returns only the logged-in Student's paginated submissions with meta."
+          },
+          "response": []
+        },
+        {
+          "name": "List all submissions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/submissions?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["submissions"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Optional PENDING, APPROVED, or REJECTED."
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Optional project/student name/email search, max 150 characters."
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Optional positive integer; defaults to 1."
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Optional integer 1-100; defaults to 10."
+                }
+              ]
+            },
+            "description": "Mentor or Admin only. Optional query: status, search, page, limit. Server-side filter and pagination. Each submission includes student and reviewer public fields."
+          },
+          "response": []
+        },
+        {
+          "name": "Submission statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/submissions/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["submissions", "stats"]
+            },
+            "description": "Mentor or Admin only. No body, path parameters, or query. Expected 200 with data.total, data.pending, data.approved, and data.rejected."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "description": "Review endpoints require an authenticated Mentor or Admin.",
+      "item": [
+        {
+          "name": "Approve or reject submission",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\",\n  \"reviewComment\": \"Great work. The project is clear and works as expected.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reviews/{{submissionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["reviews", "{{submissionId}}"]
+            },
+            "description": "Mentor or Admin only. Path: submissionId. Body: status APPROVED or REJECTED; reviewComment 5-2000 characters (required). Expected 200 with reviewed submission, student, and reviewer in data. Missing ID: 404; already reviewed: 409."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
