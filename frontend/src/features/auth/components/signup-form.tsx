@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +38,7 @@ export function SignupForm() {
   const onSubmit = async (values: SignupFormValues) => {
     try {
       const response = await signupMutation.mutateAsync(values);
+      toast.success(response.message || "Account created successfully.");
       const role = response.data.user.role;
 
       if (role === "ADMIN") {
@@ -48,19 +50,23 @@ export function SignupForm() {
       }
 
       router.refresh();
-    } catch {
-      // The mutation error is displayed below.
+    } catch (error) {
+      const data =
+        typeof error === "object" && error !== null && "data" in error
+          ? error.data
+          : null;
+      const message =
+        typeof data === "object" &&
+        data !== null &&
+        "message" in data &&
+        typeof data.message === "string"
+          ? data.message
+          : error instanceof Error
+            ? error.message
+            : "Unable to create your account. Please try again.";
+      toast.error(message);
     }
   };
-
-  const errorMessage = signupMutation.error
-    ? (
-        signupMutation.error as {
-          data?: { message?: string };
-          message?: string;
-        }
-      ).data?.message ?? signupMutation.error.message
-    : null;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -116,12 +122,6 @@ export function SignupForm() {
           </p>
         )}
       </div>
-
-      {errorMessage && (
-        <p role="alert" className="text-sm text-destructive">
-          {errorMessage}
-        </p>
-      )}
 
       <Button
         type="submit"

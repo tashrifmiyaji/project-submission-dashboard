@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,18 +34,32 @@ export function LoginForm() {
 
   const onSubmit = async (values: LoginFormValues) => {
     try {
-     const response = await loginMutation.mutateAsync(values);
-    const { role } = response.data.user;
+      const response = await loginMutation.mutateAsync(values);
+      toast.success(response.message || "Signed in successfully.");
 
-    if (role === "ADMIN") {
-      router.replace("/admin/dashboard");
-    } else if (role === "MENTOR") {
-      router.replace("/mentor/dashboard");
-    } else {
-      router.replace("/student/dashboard");
-    }
-    } catch {
-      // The API error is displayed below.
+      const { role } = response.data.user;
+      if (role === "ADMIN") {
+        router.replace("/admin/dashboard");
+      } else if (role === "MENTOR") {
+        router.replace("/mentor/dashboard");
+      } else {
+        router.replace("/student/dashboard");
+      }
+    } catch (error) {
+      const data =
+        typeof error === "object" && error !== null && "data" in error
+          ? error.data
+          : null;
+      const message =
+        typeof data === "object" &&
+        data !== null &&
+        "message" in data &&
+        typeof data.message === "string"
+          ? data.message
+          : error instanceof Error
+            ? error.message
+            : "Unable to sign in. Please try again.";
+      toast.error(message);
     }
   };
 
@@ -91,14 +105,6 @@ export function LoginForm() {
         )}
       </div>
 
-      {loginMutation.isError && (
-        <p role="alert" className="text-sm text-destructive">
-          {loginMutation.error instanceof Error
-            ? loginMutation.error.message
-            : "Unable to sign in. Please try again."}
-        </p>
-      )}
-
       <Button
         type="submit"
         className="w-full"
@@ -113,4 +119,3 @@ export function LoginForm() {
     </form>
   );
 }
-

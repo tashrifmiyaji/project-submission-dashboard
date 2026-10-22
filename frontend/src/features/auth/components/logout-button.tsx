@@ -3,6 +3,7 @@
 
 import { useRouter } from "next/navigation";
 import { LoaderCircle, LogOut } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { useLogout } from "@/features/auth/hooks/use-logout";
@@ -13,12 +14,26 @@ export function LogoutButton() {
 
   const handleLogout = async () => {
     try {
-      await logoutMutation.mutateAsync();
+      const response = await logoutMutation.mutateAsync();
+      toast.success(response.message || "Logged out successfully.");
 
       router.replace("/login");
       router.refresh();
-    } catch {
-      // Logout failed; remain on the current page.
+    } catch (error) {
+      const data =
+        typeof error === "object" && error !== null && "data" in error
+          ? error.data
+          : null;
+      const message =
+        typeof data === "object" &&
+        data !== null &&
+        "message" in data &&
+        typeof data.message === "string"
+          ? data.message
+          : error instanceof Error
+            ? error.message
+            : "Unable to log out. Please try again.";
+      toast.error(message);
     }
   };
 
