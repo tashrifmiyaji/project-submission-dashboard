@@ -4,7 +4,6 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 
 import { AppError } from "../utils/AppError.js";
 import { prisma } from "../lib/prisma.js";
-import { de } from "zod/v4/locales";
 
 export const authMiddleware: RequestHandler = async (req, _res, next) => {
   try {
