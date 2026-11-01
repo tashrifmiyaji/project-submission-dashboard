@@ -30,16 +30,6 @@ export function GuestGuard({
     }
   }, [isPending, isError, router, user]);
 
-  if (isPending) {
-    return (
-      <main className="flex min-h-svh items-center justify-center">
-        <p className="text-sm text-muted-foreground">
-          Checking session...
-        </p>
-      </main>
-    );
-  }
-
   if (!isError && user) {
     return null;
   }
