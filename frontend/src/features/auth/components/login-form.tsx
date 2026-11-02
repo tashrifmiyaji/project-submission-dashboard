@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoaderCircle, Server } from "lucide-react";
+import { LoaderCircle, Server, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -18,6 +18,11 @@ import {
 } from "@/features/auth/schemas/login.schema";
 import { useLogin } from "@/features/auth/hooks/use-login";
 
+const DEMO_ADMIN_CREDENTIALS: LoginFormValues = {
+  email: process.env.NEXT_PUBLIC_ADMIN_EMAIL?? "admin@gmail.com",
+  password: process.env.NEXT_PUBLIC_ADMIN_PASSWORD ?? "admin.123!",
+};
+
 export function LoginForm() {
   const router = useRouter();
   const loginMutation = useLogin();
@@ -30,8 +35,7 @@ export function LoginForm() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      ...DEMO_ADMIN_CREDENTIALS,
     },
   });
 
@@ -136,6 +140,21 @@ export function LoginForm() {
         )}
 
         {loginMutation.isPending ? "Signing in..." : "Sign in"}
+      </Button>
+
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full"
+        onClick={() => void onSubmit(DEMO_ADMIN_CREDENTIALS)}
+        disabled={loginMutation.isPending || isWakingServer}
+      >
+        {loginMutation.isPending ? (
+          <LoaderCircle className="animate-spin" />
+        ) : (
+          <ShieldCheck />
+        )}
+        {loginMutation.isPending ? "Signing in..." : "Demo Admin"}
       </Button>
 
       <Button
